@@ -67,13 +67,14 @@ export default {
     computed: {
         style() {
             return this.show
-                ? { top: `${this.top}px`, left: `${this.left}px` }
+                ? { top: `${this.top}px`, left: `${this.left}px`, zIndex: this.zIndex }
                 : null;
         }
     },
 
     data() {
         return {
+            zIndex: null,
             top: null,
             left: null,
             show: false,
@@ -216,9 +217,21 @@ export default {
             }
         },
 
+        getZindexIfInPopover(element){
+            if(!element)
+                return "";
+
+            if(element.style.zIndex)
+                return Number(element.style.zIndex) + 1;
+
+            return this.getZindexIfInPopover(element.parentElement)
+        },
+
         open(event, data) {
             this.data = data;
             this.show = true;
+            
+            this.zIndex = this.getZindexIfInPopover(event.currentTarget)
 
             this.$nextTick(() => {
                 [this.top, this.left] = this.positionMenu(event.clientY, event.clientX, this.$el);
